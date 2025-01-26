@@ -2,6 +2,7 @@ using Grpc.Core;
 using PersonCRUD.Domain.Contract;
 using PersonCRUD.Domain.Models;
 using PersonCRUD.Infrastructure.Data;
+using PersonCRUD.Protos;
 
 namespace PersonCRUD.Services
 {
@@ -9,16 +10,16 @@ namespace PersonCRUD.Services
     {
         private readonly ILogger<PersonService> _logger;
         private readonly PersonDbContext _context;
-        private readonly List<PersonRequest> _persons = [];
+
         private readonly IRepository _repository;
-        private int _nextId = 1;
+
         public PersonService(ILogger<PersonService> logger, IRepository repository)
         {
             _logger = logger;
             _repository = repository;
         }
 
-        public override async Task<PersonReply> GetPerson(PersonRequest request, ServerCallContext context)
+        public async override Task<PersonReply> GetPerson(PersonRequest request, ServerCallContext context)
         {
             // 1. Retrieve the person from your data store based on the ID
             var person = await _repository.GetByIDAsync(request.ID);
@@ -43,15 +44,15 @@ namespace PersonCRUD.Services
 
             return reply;
         }
-        public async Task<List<PersonReply>> GetPersonList(Empty empty, ServerCallContext context)
+        public async override Task<PersonListReply> GetPersonList(Empty empty, ServerCallContext context)
         {
             var personList = await _repository.GetAllAsync();
 
-            List<PersonReply> replyList = [];
+            PersonListReply replyList = new();
 
             foreach (var person in personList)
             {
-                replyList.Add(new PersonReply
+                replyList.People.Add(new PersonReply
                 {
                     ID = (int)person.ID,
                     FirstName = person.FirstName,
@@ -65,11 +66,11 @@ namespace PersonCRUD.Services
             return replyList;
         }
 
-        public Task<PersonReply> CreatePerson(CreatePersonRequest request, ServerCallContext context)
+        public async override Task<PersonReply> CreatePerson(CreatePersonRequest request, ServerCallContext context)
         {
             try
             {
-                var person = new Individual // Your EF Core model
+                var person = new Individual
                 {
                     FirstName = request.FirstName,
                     LastName = request.LastName,
@@ -77,9 +78,9 @@ namespace PersonCRUD.Services
                     BirthDate = DateTime.Parse(request.BirthDate)
                 };
 
-                _repository.AddAsync(person);
+                await _repository.AddAsync(person);
 
-                return Task.FromResult(new PersonReply
+                return new PersonReply
                 {
                     ID = (int)person.ID,
                     FirstName = person.FirstName,
@@ -87,8 +88,8 @@ namespace PersonCRUD.Services
                     NationalNo = person.NationalNo,
                     BirthDate = person.BirthDate.ToString(),
                     Message = "Person created successfully.",
-                    StatusID = 200 // OK
-                });
+                    StatusID = 200
+                };
             }
             catch (Exception ex)
             {
@@ -96,13 +97,13 @@ namespace PersonCRUD.Services
                 var res = new PersonReply
                 {
                     Message = $"Error creating person: {ex.Message}",
-                    StatusID = 500 // Internal Server Error
+                    StatusID = 500
                 };
-                return Task.FromResult(res);
+                return res;
             }
         }
 
-        public async Task<PersonReply> UpdateItem(UpdatePersonRequest request, ServerCallContext context)
+        public async override Task<PersonReply> UpdatePerson(UpdatePersonRequest request, ServerCallContext context)
         {
             try
             {
@@ -116,13 +117,12 @@ namespace PersonCRUD.Services
                     };
                 }
 
-                person.FirstName = request.FirstName ?? person.FirstName; // Update only if a new value is provided.
+                person.FirstName = request.FirstName ?? person.FirstName;
                 person.LastName = request.LastName ?? person.LastName;
                 person.NationalNo = request.NationalNo ?? person.NationalNo;
                 person.BirthDate = DateTime.TryParse(request.BirthDate, out var birthDate) ? birthDate : person.BirthDate;
 
                 await _repository.UpdateAsync(person);
-                //await _context.SaveChangesAsync();
 
                 return new PersonReply
                 {
@@ -146,7 +146,7 @@ namespace PersonCRUD.Services
             }
         }
 
-        public async Task<PersonReply> DeleteItem(PersonRequest request, ServerCallContext context)
+        public async override Task<PersonReply> DeletePerson(PersonRequest request, ServerCallContext context)
         {
             try
             {
@@ -160,7 +160,7 @@ namespace PersonCRUD.Services
                     };
                 }
 
-                _repository.DeleteAsync(person.ID);
+                await _repository.DeleteAsync(person.ID);
 
                 return new PersonReply
                 {

@@ -1,9 +1,9 @@
 using Grpc.Net.Client;
 using Microsoft.AspNetCore.Mvc;
-using PersonCRUD;
+using PersonCRUD.Protos;
 
 
-namespace Admin.API.Controllers
+namespace Client.API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]

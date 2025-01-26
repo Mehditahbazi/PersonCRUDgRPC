@@ -1,9 +1,6 @@
 syntax = "proto3";
 
-option csharp_namespace = "PersonCRUD";
-
-package Person;
-
+option csharp_namespace = "PersonCRUD.Protos";
 
 service Person {
   rpc CreatePerson(CreatePersonRequest) returns (PersonReply);
