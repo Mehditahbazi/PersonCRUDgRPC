@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+option csharp_namespace = "PersonCRUD";
+
+package Person;
+
+
+service Person {
+  rpc CreatePerson(CreatePersonRequest) returns (PersonReply);
+  rpc GetPersonList(Empty) returns (PersonListReply);
+  rpc GetPerson(PersonRequest) returns (PersonReply);
+  rpc UpdatePerson(UpdatePersonRequest) returns (PersonReply);
+  rpc DeletePerson(PersonRequest) returns (PersonReply);
+}
+
+message PersonRequest {
+	int32 ID = 1;
+  }
+
+  message CreatePersonRequest {
+	string FirstName = 1;
+	string LastName =2;
+	string NationalNo =3;
+	string BirthDate =4;
+  } 
+  message UpdatePersonRequest {
+	int32 ID = 1;
+	string FirstName = 2;
+	string LastName =3;
+	string NationalNo =4;
+	string BirthDate =5;
+  }
+
+message PersonReply {
+	int32 ID = 1;
+	string FirstName = 2;
+	string LastName =3;
+	string NationalNo =4;
+	string BirthDate =5;
+	string Message = 6;
+	int32 StatusID =7;
+}
+
+message PersonListReply {
+  repeated PersonReply People = 1; 
+}
+
+message Empty{}

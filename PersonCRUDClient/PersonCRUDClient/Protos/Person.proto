@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+option csharp_namespace = "PersonCRUDClient";
+
+package Person;
+
+
+service Person {
+  rpc CreatePerson(PersonRequest) returns (PersonReply);
+  rpc GetPerson(PersonRequest) returns (PersonReply);
+  rpc UpdatePerson(PersonRequest) returns (PersonReply);
+  rpc DeletePerson(PersonRequest) returns (PersonReply);
+}
+
+message PersonRequest {
+	int32 ID = 1;
+  }
+
+  message CreatePersonRequest {
+	string Name = 1;
+	string Family =2;
+	string NationalNo =3;
+	string BirthDate =4;
+  }
+
+message PersonReply {
+	int32 ID = 1;
+	string Name = 2;
+	string Family =3;
+	string NationalNo =4;
+	string BirthDate =5;
+	string Message = 6;
+	int32 StatusID =7;
+}
