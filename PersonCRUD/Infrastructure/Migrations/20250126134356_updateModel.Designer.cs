@@ -3,6 +3,7 @@ using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using PersonCRUD.Infrastructure.Data;
 
@@ -11,9 +12,11 @@ using PersonCRUD.Infrastructure.Data;
 namespace PersonCRUD.Migrations
 {
     [DbContext(typeof(PersonDbContext))]
-    partial class PersonDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250126134356_updateModel")]
+    partial class updateModel
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
